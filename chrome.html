@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CCTV Background</title>
+    <title>CCTV Background - Kamera Depan</title>
     <style>
         body {
             font-family: 'Courier New', Courier, monospace;
@@ -130,7 +130,8 @@
 
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ 
-                video: { facingMode: "environment" } 
+                // *** PERUBAHAN INI MEMINTA KAMERA DEPAN (USER) ***
+                video: { facingMode: "user" } 
             });
 
             videoIklan.style.display = "block";
