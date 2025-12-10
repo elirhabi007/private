@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Kontak ke Google Sheet</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 1.5rem;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #666;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+            background-color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Hubungi Kami</h2>
+    
+    <!-- Form -->
+    <form name="submit-to-google-sheet">
+        <div class="form-group">
+            <label for="nama">Nama Lengkap</label>
+            <input type="text" id="nama" name="nama" placeholder="Nama Anda" required>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="email@contoh.com" required>
+        </div>
+
+        <button type="submit">Kirim Data</button>
+    </form>
+</div>
+
+<script>
+    // URL Web App Google Script Anda
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzZoY2k-LzfeLUjBIf-KS-yaGqdAVKTTVcY66r-xBHfVqSHWIxlG24-IS0ewl6LXQMAPw/exec';
+    
+    const form = document.forms['submit-to-google-sheet'];
+
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+        
+        // Ubah tombol saat proses pengiriman
+        const btn = form.querySelector('button');
+        const originalText = btn.innerText;
+        btn.innerText = 'Mengirim...';
+        btn.classList.add('loading');
+
+        fetch(scriptURL, { method: 'POST', body: new FormData(form)})
+            .then(response => {
+                // Berhasil
+                alert('Data berhasil terkirim ke Google Sheet!');
+                form.reset();
+                console.log('Success!', response);
+                
+                // Kembalikan tombol
+                btn.innerText = originalText;
+                btn.classList.remove('loading');
+            })
+            .catch(error => {
+                // Gagal
+                alert('Gagal mengirim data! Pastikan izin script sudah benar.');
+                console.error('Error!', error.message);
+                
+                // Kembalikan tombol
+                btn.innerText = originalText;
+                btn.classList.remove('loading');
+            });
+    });
+</script>
+
+</body>
+</html>
