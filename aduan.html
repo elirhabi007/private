@@ -4,63 +4,103 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Form Kontak + Contact Picker</title>
+
     <style>
         body {
             font-family: Arial, sans-serif;
             background: #f2f2f7;
+            margin: 0;
+            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            margin: 0;
         }
+
         .container {
             background: #fff;
             padding: 20px;
-            border-radius: 10px;
             width: 90%;
             max-width: 400px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
+
         h2 {
             margin-top: 0;
             text-align: center;
         }
+
         .form-group {
             margin-bottom: 1rem;
         }
+
         label {
             font-weight: bold;
         }
+
         input, textarea {
             width: 100%;
             padding: 10px;
-            border: 1px solid #ddd;
             border-radius: 6px;
+            border: 1px solid #ccc;
+            margin-top: 5px;
             box-sizing: border-box;
+            font-size: 15px;
         }
+
         button {
             width: 100%;
             padding: 12px;
-            border: none;
             background: #007bff;
+            border: none;
+            border-radius: 6px;
             color: white;
             font-size: 16px;
-            border-radius: 6px;
             cursor: pointer;
             margin-top: 10px;
         }
+
         button:hover {
             background: #0056b3;
         }
+
         #pick {
             background: #28a745;
         }
         #pick:hover {
             background: #1e7e34;
         }
+
+        /* ======================
+           ANIMASI LOADING
+        ======================= */
+        #loadingOverlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(2px);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 6px solid #ddd;
+            border-top: 6px solid #3498db;
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
+
 <body>
 
 <div class="container">
@@ -89,39 +129,49 @@
 </div>
 
 
+<!-- Overlay Loading -->
+<div id="loadingOverlay">
+    <div class="spinner"></div>
+</div>
+
+
 <script>
-/* =============================
-   FITUR PILIH KONTAK HP (ANDROID)
-============================= */
+/* ==========================================================
+   FITUR PILIH KONTAK HP — Nama & Nomor otomatis terisi
+========================================================== */
 async function pickContact() {
     if (!("contacts" in navigator && "select" in navigator.contacts)) {
-        alert("Fitur pilih kontak tidak didukung di perangkat ini.\nGunakan Chrome Android terbaru.");
+        alert("Browser tidak mendukung fitur pilih kontak.\nGunakan Chrome Android terbaru.");
         return;
     }
 
     try {
-        const contacts = await navigator.contacts.select(
+        const result = await navigator.contacts.select(
             ["name", "tel"],
             { multiple: false }
         );
 
-        if (contacts.length > 0) {
-            let nomor = contacts[0].tel[0];
-            // Bersihkan format nomor
+        if (result.length > 0) {
+            let nama = result[0].name[0] || "";
+            let nomor = result[0].tel[0] || "";
+
             nomor = nomor.replace(/\s+/g, "").replace(/-/g, "");
+
+            document.getElementById("nama").value = nama;
             document.getElementById("wa").value = nomor;
         }
 
     } catch (err) {
-        console.error("Gagal memilih kontak: ", err);
+        console.error("Gagal memilih kontak:", err);
     }
 }
 
 
-/* =============================
-   KIRIM DATA KE GOOGLE SHEET
-============================= */
+/* ==========================================================
+   KIRIM KE GOOGLE SHEET + ANIMASI LOADING
+========================================================== */
 const form = document.getElementById("contactForm");
+const loading = document.getElementById("loadingOverlay");
 
 form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -130,16 +180,22 @@ form.addEventListener("submit", async (e) => {
 
     const formData = new FormData(form);
 
+    loading.style.display = "flex"; // Tampilkan loading
+
     try {
-        const res = await fetch(scriptURL, {
+        await fetch(scriptURL, {
             method: "POST",
             body: formData
         });
+
+        loading.style.display = "none"; // Hilangkan
 
         alert("Data berhasil dikirim!");
         form.reset();
 
     } catch (err) {
+        loading.style.display = "none";
+
         alert("Gagal mengirim data!");
         console.error(err);
     }
