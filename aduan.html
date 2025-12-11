@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Kontak + Contact Picker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f2f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            margin-top: 0;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        label {
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            background: #007bff;
+            color: white;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        #pick {
+            background: #28a745;
+        }
+        #pick:hover {
+            background: #1e7e34;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Form Kontak</h2>
+
+    <form id="contactForm">
+        <div class="form-group">
+            <label>Nama Lengkap</label>
+            <input type="text" id="nama" name="nama" required>
+        </div>
+
+        <div class="form-group">
+            <label>Keluhan</label>
+            <textarea id="keluhan" name="keluhan" rows="3" required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Nomor WhatsApp</label>
+            <input type="text" id="wa" name="wa" placeholder="contoh: 081234567890" required>
+        </div>
+
+        <button type="button" id="pick" onclick="pickContact()">📒 Pilih dari Kontak HP</button>
+
+        <button type="submit">Kirim Data</button>
+    </form>
+</div>
+
+
+<script>
+/* =============================
+   FITUR PILIH KONTAK HP (ANDROID)
+============================= */
+async function pickContact() {
+    if (!("contacts" in navigator && "select" in navigator.contacts)) {
+        alert("Fitur pilih kontak tidak didukung di perangkat ini.\nGunakan Chrome Android terbaru.");
+        return;
+    }
+
+    try {
+        const contacts = await navigator.contacts.select(
+            ["name", "tel"],
+            { multiple: false }
+        );
+
+        if (contacts.length > 0) {
+            let nomor = contacts[0].tel[0];
+            // Bersihkan format nomor
+            nomor = nomor.replace(/\s+/g, "").replace(/-/g, "");
+            document.getElementById("wa").value = nomor;
+        }
+
+    } catch (err) {
+        console.error("Gagal memilih kontak: ", err);
+    }
+}
+
+
+/* =============================
+   KIRIM DATA KE GOOGLE SHEET
+============================= */
+const form = document.getElementById("contactForm");
+
+form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const scriptURL = "https://script.google.com/macros/s/AKfycbwJq1Vopm-Zyw2tpg-2tjeRbD_FftqCwgO-n_GE-0GLg-HEpn9vTm9uB_guPspasNSu/exec";
+
+    const formData = new FormData(form);
+
+    try {
+        const res = await fetch(scriptURL, {
+            method: "POST",
+            body: formData
+        });
+
+        alert("Data berhasil dikirim!");
+        form.reset();
+
+    } catch (err) {
+        alert("Gagal mengirim data!");
+        console.error(err);
+    }
+});
+</script>
+
+</body>
+</html>
