@@ -3,100 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Kontak + Contact Picker</title>
+    <title>Jobdesk</title>
 
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background: #f2f2f7;
+            font-family: 'Inter', sans-serif;
+            background: #f4f6f9;
             margin: 0;
             padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            height: 100vh;
         }
 
         .container {
             background: #fff;
-            padding: 20px;
-            width: 90%;
-            max-width: 400px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 28px;
+            width: 100%;
+            max-width: 420px;
+            border-radius: 18px;
+            box-shadow: 0px 8px 25px rgba(0,0,0,0.08);
         }
 
         h2 {
-            margin-top: 0;
+            margin: 0 0 20px 0;
             text-align: center;
+            font-size: 22px;
+            color: #333;
+            font-weight: 600;
         }
 
         .form-group {
-            margin-bottom: 1rem;
+            margin-bottom: 18px;
         }
 
         label {
-            font-weight: bold;
+            font-size: 14px;
+            font-weight: 500;
+            color: #444;
+            margin-bottom: 6px;
+            display: block;
         }
 
-        input, textarea {
+        input, select {
             width: 100%;
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            margin-top: 5px;
-            box-sizing: border-box;
+            padding: 13px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
             font-size: 15px;
+            box-sizing: border-box;
+            transition: 0.2s;
+        }
+
+        input:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 6px rgba(0,123,255,0.2);
         }
 
         button {
             width: 100%;
-            padding: 12px;
-            background: #007bff;
+            padding: 14px;
             border: none;
-            border-radius: 6px;
+            border-radius: 10px;
+            background: #007bff;
             color: white;
             font-size: 16px;
             cursor: pointer;
-            margin-top: 10px;
+            transition: 0.3s;
+            font-weight: 600;
         }
 
         button:hover {
             background: #0056b3;
         }
 
-        #pick {
-            background: #28a745;
-        }
-        #pick:hover {
-            background: #1e7e34;
+        button.loading {
+            background: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.75;
         }
 
-        /* ======================
-           ANIMASI LOADING
-        ======================= */
-        #loadingOverlay {
+        #status {
+            margin-top: 12px;
+            text-align: center;
+            font-size: 14px;
+            color: green;
             display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(2px);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 6px solid #ddd;
-            border-top: 6px solid #3498db;
-            border-radius: 50%;
-            animation: spin 0.9s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -104,102 +98,85 @@
 <body>
 
 <div class="container">
-    <h2>Form Kontak</h2>
+    <h2>Input Jobdesk</h2>
 
-    <form id="contactForm">
+    <form name="submit-to-google-sheet">
+
         <div class="form-group">
-            <label>Nama Lengkap</label>
-            <input type="text" id="nama" name="nama" required>
+            <label>Nama</label>
+            <input type="text" id="nama" name="nama" placeholder="Nama Anda" required>
         </div>
 
         <div class="form-group">
-            <label>Keluhan</label>
-            <textarea id="keluhan" name="keluhan" rows="3" required></textarea>
+            <label>Catatan</label>
+            <input type="text" id="catatan" name="catatan" placeholder="Masukkan catatan..." required>
         </div>
 
         <div class="form-group">
-            <label>Nomor WhatsApp</label>
-            <input type="text" id="wa" name="wa" placeholder="contoh: 081234567890" required>
+            <label>Kontak WhatsApp</label>
+            <input type="tel" id="wa" name="wa" placeholder="08xxxxxxxxxx" required>
         </div>
 
-        <button type="button" id="pick" onclick="pickContact()">📒 Pilih dari Kontak HP</button>
+        <!-- Tombol ambil kontak -->
+        <button type="button" onclick="ambilKontak()">📱 Pilih dari Kontak</button>
 
-        <button type="submit">Kirim Data</button>
+        <br><br>
+
+        <button type="submit" id="btnSubmit">Kirim Data</button>
+
+        <div id="status">Data berhasil dikirim!</div>
     </form>
 </div>
 
 
-<!-- Overlay Loading -->
-<div id="loadingOverlay">
-    <div class="spinner"></div>
-</div>
-
-
 <script>
-/* ==========================================================
-   FITUR PILIH KONTAK HP — Nama & Nomor otomatis terisi
-========================================================== */
-async function pickContact() {
-    if (!("contacts" in navigator && "select" in navigator.contacts)) {
-        alert("Browser tidak mendukung fitur pilih kontak.\nGunakan Chrome Android terbaru.");
-        return;
-    }
-
-    try {
-        const result = await navigator.contacts.select(
-            ["name", "tel"],
-            { multiple: false }
-        );
-
-        if (result.length > 0) {
-            let nama = result[0].name[0] || "";
-            let nomor = result[0].tel[0] || "";
-
-            nomor = nomor.replace(/\s+/g, "").replace(/-/g, "");
-
-            document.getElementById("nama").value = nama;
-            document.getElementById("wa").value = nomor;
-        }
-
-    } catch (err) {
-        console.error("Gagal memilih kontak:", err);
-    }
-}
-
-
-/* ==========================================================
-   KIRIM KE GOOGLE SHEET + ANIMASI LOADING
-========================================================== */
-const form = document.getElementById("contactForm");
-const loading = document.getElementById("loadingOverlay");
-
-form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
+    // URL Google Sheet Web App
     const scriptURL = "https://script.google.com/macros/s/AKfycbwJq1Vopm-Zyw2tpg-2tjeRbD_FftqCwgO-n_GE-0GLg-HEpn9vTm9uB_guPspasNSu/exec";
 
-    const formData = new FormData(form);
+    const form = document.forms['submit-to-google-sheet'];
+    const btn = document.getElementById("btnSubmit");
+    const status = document.getElementById("status");
 
-    loading.style.display = "flex"; // Tampilkan loading
+    // Fungsi ambil kontak
+    async function ambilKontak() {
+        try {
+            const contacts = await navigator.contacts.select(
+                ["name", "tel"],
+                { multiple: false }
+            );
 
-    try {
-        await fetch(scriptURL, {
-            method: "POST",
-            body: formData
-        });
+            if (contacts.length > 0) {
+                document.getElementById("nama").value = contacts[0].name[0] || "";
+                document.getElementById("wa").value = contacts[0].tel[0] || "";
+            }
 
-        loading.style.display = "none"; // Hilangkan
-
-        alert("Data berhasil dikirim!");
-        form.reset();
-
-    } catch (err) {
-        loading.style.display = "none";
-
-        alert("Gagal mengirim data!");
-        console.error(err);
+        } catch (error) {
+            // popup dihapus
+        }
     }
-});
+
+    // Kirim data tanpa alert
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+
+        btn.innerText = "Mengirim...";
+        btn.classList.add("loading");
+
+        fetch(scriptURL, { method: 'POST', body: new FormData(form) })
+            .then(() => {
+                form.reset();
+
+                btn.innerText = "Kirim Data";
+                btn.classList.remove("loading");
+
+                status.style.display = "block";
+                setTimeout(() => status.style.display = "none", 2000);
+            })
+            .catch(() => {
+                btn.innerText = "Kirim Data";
+                btn.classList.remove("loading");
+            });
+    });
 </script>
 
 </body>
