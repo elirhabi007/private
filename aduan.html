@@ -19,7 +19,7 @@
             background: #fff;
             padding: 25px;
             width: 100%;
-            max-width: 480px; /* Sedikit diperlebar agar tabel muat */
+            max-width: 500px;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             margin-bottom: 25px;
@@ -44,9 +44,9 @@
         button:hover { opacity: 0.9; }
         .loading { opacity: 0.6; pointer-events: none; }
 
-        /* --- STYLE TABEL EXCEL DENGAN GARIS TEGAS --- */
+        /* --- STYLE TABEL EXCEL --- */
         #tabel-area {
-            width: 100%; max-width: 600px;
+            width: 100%; max-width: 650px; /* Lebar ditambah agar muat 6 kolom */
             background: white; padding: 10px;
             border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             display: none;
@@ -54,30 +54,32 @@
 
         table {
             width: 100%;
-            border-collapse: collapse; /* Garis menyatu (Excel style) */
-            font-size: 12px; /* Font agak diperkecil agar muat */
+            border-collapse: collapse; /* Garis menyatu */
+            font-size: 12px;
             color: #333;
         }
 
         th, td {
-            border: 1px solid #999; /* Warna garis abu tua */
-            padding: 6px;
+            border: 1px solid #999; /* Garis Excel Abu Tua */
+            padding: 8px;
             text-align: center;
             vertical-align: middle;
         }
 
         th {
-            background-color: #e0e0e0; /* Header abu muda */
+            background-color: #e0e0e0; /* Header Abu Muda */
             font-weight: bold;
+            white-space: nowrap; /* Agar header tidak turun baris */
         }
 
-        /* Kolom Aksi */
+        /* Tombol Aksi di dalam tabel */
         .btn-action {
-            background: none; border: none; font-size: 16px; 
-            cursor: pointer; padding: 4px; margin: 0;
-            width: 100%; height: 100%; display: block;
+            background: none; border: none; font-size: 18px; 
+            cursor: pointer; padding: 5px; margin: 0;
+            width: 100%; display: block;
+            transition: 0.2s;
         }
-        .btn-action:hover { background-color: #f0f0f0; }
+        .btn-action:hover { background-color: #f0f0f0; transform: scale(1.1); }
 
     </style>
 </head>
@@ -103,18 +105,14 @@
     <div style="overflow-x:auto;">
         <table>
             <thead>
-                <!-- Baris Header 1: Merge Aksi -->
                 <tr>
-                    <th rowspan="2" style="width:25px">No</th>
-                    <th rowspan="2">Nama</th>
-                    <th rowspan="2">Catatan</th>
-                    <th rowspan="2">Status</th>
-                    <th colspan="2">Aksi</th> <!-- Merge 2 Kolom -->
-                </tr>
-                <!-- Baris Header 2: Sub-judul Aksi -->
-                <tr>
-                    <th style="font-size:10px; width:40px;">Reschedule</th>
-                    <th style="font-size:10px; width:40px;">Delete</th>
+                    <th style="width:25px">No</th>
+                    <th>Nama</th>
+                    <th>Catatan</th>
+                    <th>Status</th>
+                    <!-- DUA KOLOM BARU -->
+                    <th style="width:60px">Reschedule</th>
+                    <th style="width:50px">Delete</th>
                 </tr>
             </thead>
             <tbody id="tableBody"></tbody>
@@ -123,7 +121,7 @@
 </div>
 
 <script>
-    // URL Web App Anda
+    // URL WEB APP ANDA
     const scriptURL = "https://script.google.com/macros/s/AKfycbwJq1Vopm-Zyw2tpg-2tjeRbD_FftqCwgO-n_GE-0GLg-HEpn9vTm9uB_guPspasNSu/exec";
 
     const form = document.forms['submit-to-google-sheet'];
@@ -164,7 +162,7 @@
                 tableBody.innerHTML = "";
 
                 if(rows.length === 0) {
-                    // Colspan jadi 6 karena kolom aksi dipecah 2
+                    // Colspan jadi 6 karena ada 6 kolom total
                     tableBody.innerHTML = "<tr><td colspan='6'>Belum ada data</td></tr>";
                 } else {
                     rows.forEach((item, index) => {
@@ -173,13 +171,14 @@
                         let statusText = data[4];
                         let statusEmoji = statusText === 'SENT' ? '✅' : '⏳';
 
-                        // Tombol Aksi: Reschedule (Kiri) & Delete (Kanan)
-                        let btnReschedule = '-';
-                        let btnDelete = '-';
+                        // Tombol Aksi dipecah jadi 2 variabel
+                        let cellReschedule = '-';
+                        let cellDelete = '-';
 
+                        // Hanya muncul jika status SENT
                         if(statusText === 'SENT') {
-                            btnReschedule = `<button class="btn-action" onclick="handleAction('reschedule', ${realRow})" title="Reschedule">🔄</button>`;
-                            btnDelete = `<button class="btn-action" onclick="handleAction('delete', ${realRow})" title="Hapus">🗑️</button>`;
+                            cellReschedule = `<button class="btn-action" onclick="handleAction('reschedule', ${realRow})" title="Reschedule (Kirim Ulang)">🔄</button>`;
+                            cellDelete = `<button class="btn-action" onclick="handleAction('delete', ${realRow})" title="Hapus Permanen">🗑️</button>`;
                         }
 
                         let tr = document.createElement("tr");
@@ -188,8 +187,8 @@
                             <td style="text-align:left; font-weight:500">${data[1]}</td>
                             <td style="text-align:left">${data[2]}</td>
                             <td>${statusEmoji}</td>
-                            <td>${btnReschedule}</td> <!-- Kolom Reschedule -->
-                            <td>${btnDelete}</td>     <!-- Kolom Delete -->
+                            <td>${cellReschedule}</td> <!-- Kolom Khusus Reschedule -->
+                            <td>${cellDelete}</td>     <!-- Kolom Khusus Delete -->
                         `;
                         tableBody.appendChild(tr);
                     });
@@ -200,9 +199,9 @@
             });
     }
 
-    // 3. HANDLE RESCHEDULE & DELETE
+    // 3. HANDLE AKSI
     function handleAction(actionType, rowNumber) {
-        let confirmMsg = actionType === 'delete' ? "Hapus data ini?" : "Reschedule kirim ulang?";
+        let confirmMsg = actionType === 'delete' ? "Hapus data ini?" : "Reschedule (Kirim WA Ulang)?";
         if(!confirm(confirmMsg)) return;
 
         btnJob.innerText = "Memproses...";
