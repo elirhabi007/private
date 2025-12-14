@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f0f2f5;
+            background-color: #f8f9fa;
             display: flex;
             justify-content: center;
             align-items: flex-start;
@@ -22,42 +22,34 @@
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             width: 100%;
-            max-width: 600px; /* Diperlebar agar muat kolom Catatan */
+            max-width: 650px;
         }
-        h2 { text-align: center; color: #333; margin-top: 0; font-size: 1.5rem; }
+        h2 { text-align: center; color: #333; margin-top: 0; }
         
-        /* FORM STYLES */
+        /* FORM INPUT */
         .form-group { margin-bottom: 1rem; }
-        label { display: block; margin-bottom: 0.5rem; color: #555; font-weight: 600; font-size: 0.9rem; }
+        label { display: block; margin-bottom: 0.5rem; color: #555; font-weight: 600; }
         input, textarea {
             width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px;
-            box-sizing: border-box; font-size: 16px; transition: border 0.3s;
+            box-sizing: border-box; font-size: 16px;
         }
-        input:focus, textarea:focus { border-color: #007bff; outline: none; }
-
         .input-group { display: flex; gap: 8px; }
         .input-group input { flex: 1; }
-        
         .btn-icon {
             padding: 0 15px; background-color: #007bff; color: white; border: none;
             border-radius: 8px; cursor: pointer; font-size: 1.4rem;
             display: flex; align-items: center; justify-content: center;
         }
-        .btn-icon:hover { background-color: #0069d9; }
-        
-        /* TOMBOL UTAMA */
+
+        /* TOMBOL */
         .btn-primary {
             width: 100%; padding: 14px; background-color: #28a745; color: white;
-            border: none; border-radius: 8px; cursor: pointer; font-size: 1rem;
-            font-weight: bold; margin-top: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: bold; margin-top: 10px;
         }
         .btn-secondary {
-            width: 100%; padding: 12px; background-color: #6c757d; color: white;
-            border: none; border-radius: 8px; cursor: pointer; font-size: 1rem;
-            margin-top: 10px; font-weight: bold;
+            width: 100%; padding: 12px; background-color: #545b62; color: white;
+            border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: bold; margin-top: 10px;
         }
-        .btn-primary:hover { background-color: #218838; }
-        .btn-secondary:hover { background-color: #5a6268; }
         button:disabled { background-color: #ccc; cursor: not-allowed; }
 
         .alert {
@@ -65,21 +57,32 @@
             text-align: center; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;
         }
 
-        /* TABEL STYLES */
+        /* TABEL MONITORING */
         #tableContainer { margin-top: 25px; display: none; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 400px; }
-        th, td { border-bottom: 1px solid #eee; padding: 10px 5px; text-align: left; vertical-align: middle; }
-        th { background-color: #f8f9fa; color: #495057; font-weight: bold; white-space: nowrap; }
-        tr:last-child td { border-bottom: none; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; min-width: 500px; }
+        th, td { border-bottom: 1px solid #eee; padding: 12px 8px; text-align: left; vertical-align: middle; }
+        th { background-color: #f1f3f5; color: #495057; font-weight: bold; white-space: nowrap; }
         
-        /* Action Buttons in Table */
-        .btn-action {
-            padding: 6px 10px; border: none; border-radius: 4px; cursor: pointer; margin-right: 3px; font-size: 1.1rem;
+        /* STYLE LINK WHATSAPP */
+        .wa-link {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
-        .btn-reschedule { background-color: #ffc107; color: #000; }
-        .btn-delete { background-color: #dc3545; color: white; }
-        
-        .loader { text-align: center; margin-top: 15px; color: #666; display: none; font-style: italic; }
+        .wa-link:hover { text-decoration: underline; color: #0056b3; }
+
+        /* ICONS & ACTIONS */
+        .status-icon { font-size: 1.3rem; }
+        .btn-action {
+            padding: 6px 10px; border: none; border-radius: 6px; cursor: pointer; margin-right: 4px; font-size: 1.1rem;
+        }
+        .btn-reschedule { background-color: #ffc107; color: #000; } 
+        .btn-delete { background-color: #dc3545; color: white; }    
+
+        .loader { text-align: center; margin-top: 15px; color: #666; display: none; }
     </style>
 </head>
 <body>
@@ -87,156 +90,149 @@
 <div class="container">
     <h2>Input Jobdesk</h2>
     
-    <!-- Form Input -->
+    <!-- Form -->
     <form id="jobForm">
         <div class="form-group">
             <label>Nama</label>
             <input type="text" name="nama" id="namaInput" required placeholder="Contoh: Budi">
         </div>
-
         <div class="form-group">
             <label>Catatan</label>
-            <textarea name="catatan" rows="3" required placeholder="Detail pekerjaan..."></textarea>
+            <textarea name="catatan" rows="3" required placeholder="Isi catatan jobdesk..."></textarea>
         </div>
-
         <div class="form-group">
-            <label>Nomor WhatsApp</label>
+            <label>WhatsApp</label>
             <div class="input-group">
                 <input type="tel" name="wa" id="waInput" required placeholder="08123xxxxx">
-                <!-- Tombol Kontak menggunakan Entity Code -->
-                <button type="button" class="btn-icon" id="btnContact" title="Ambil dari Kontak HP">
-                    &#128210;
-                </button>
+                <button type="button" class="btn-icon" id="btnContact" title="Ambil Kontak HP">&#128210;</button>
             </div>
         </div>
-
         <button type="submit" class="btn-primary" id="btnSubmit">Kirim Data</button>
     </form>
-
     <div id="statusMsg" class="alert">Data berhasil disimpan!</div>
 
-    <!-- Bagian Monitoring -->
+    <!-- Tombol Lihat Data -->
     <hr style="margin: 25px 0; border: 0; border-top: 1px dashed #ccc;">
     <button type="button" class="btn-secondary" id="btnLoad">Lihat Daftar Jobdesk</button>
     
     <div id="loadingText" class="loader">Sedang memuat data...</div>
 
-    <!-- Tabel Data -->
+    <!-- Tabel -->
     <div id="tableContainer">
         <table id="dataTable">
             <thead>
                 <tr>
-                    <th style="width: 25px;">#</th>
+                    <th style="width: 20px;">#</th>
                     <th>Nama</th>
-                    <th>Catatan</th> <!-- Kolom Catatan Ditambahkan -->
+                    <th>Catatan</th>
                     <th>WhatsApp</th>
-                    <th style="width: 30px; text-align: center;">Sts</th>
-                    <th style="width: 90px; text-align: center;">Aksi</th>
+                    <th style="text-align: center;">Sts</th>
+                    <th style="text-align: center;">Aksi</th>
                 </tr>
             </thead>
             <tbody>
-                <!-- Data akan muncul di sini -->
+                <!-- Data Masuk Disini -->
             </tbody>
         </table>
     </div>
 </div>
 
 <script>
-    // ============================================================
-    // URL WEB APP GOOGLE SCRIPT ANDA
-    // ============================================================
-    const SCRIPT_URL = "https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLjHjm04SCNHyjy_tCNn5KVARgipk7PQbBPXg3-zRhzC4G3X35ocXhKh6CJQGn_WYBk5barxqaM8KJgiUD4Dv6aFahxs6xgj3HbdMh0V2B-HgLXsI2mbx4hUjuY5SDpsDO-bYIADvywqzLrIPw6NOr74bK2GZruOKfZKDBvmc9pdrh1j1YDG1B5eaC2Tt5hvbecst1ZjV9e2d7UNkR1D918plfBL53FWpC-MrikOq1E-N9rnffgD3jVKRmnDeEw6dp0PXkgoe0KKo13iw0V2-7Eljbmb6w&lib=MFL5tMvkvKL65CGENPxaLTyYNPH1PCFKC"; 
+    // ⚠️ MASUKAN URL WEB APP HASIL DEPLOY BARU ANDA DISINI ⚠️
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwZO99fSvQy3-sy6NHLQr7OMwQEDNACq52uSe0slEW1l7NB7pPzcbJMUPoyVMJluD0/exec"; 
 
-    // Referensi Elemen
     const form = document.getElementById('jobForm');
     const btnSubmit = document.getElementById('btnSubmit');
     const msg = document.getElementById('statusMsg');
-    const btnContact = document.getElementById('btnContact');
-    const waInput = document.getElementById('waInput');
-    const namaInput = document.getElementById('namaInput');
-    
-    // Referensi Elemen Tabel
     const btnLoad = document.getElementById('btnLoad');
     const tableContainer = document.getElementById('tableContainer');
     const tbody = document.querySelector('#dataTable tbody');
     const loader = document.getElementById('loadingText');
 
-    // --- FITUR AMBIL KONTAK ---
-    btnContact.addEventListener('click', async () => {
-        const isSupported = ('contacts' in navigator && 'ContactsManager' in window);
-        if (isSupported) {
+    // --- 1. AMBIL KONTAK (HP) ---
+    document.getElementById('btnContact').addEventListener('click', async () => {
+        if ('contacts' in navigator && 'ContactsManager' in window) {
             try {
-                const props = ['name', 'tel']; 
-                const opts = { multiple: false };
-                const contacts = await navigator.contacts.select(props, opts);
-                if (contacts.length > 0) {
-                    const contact = contacts[0];
-                    if (contact.tel && contact.tel.length > 0) waInput.value = contact.tel[0].replace(/\D/g, ''); 
-                    if (contact.name && contact.name.length > 0) namaInput.value = contact.name[0];
+                const contacts = await navigator.contacts.select(['name', 'tel'], { multiple: false });
+                if (contacts[0]) {
+                    if (contacts[0].tel) document.getElementById('waInput').value = contacts[0].tel[0].replace(/\D/g, '');
+                    if (contacts[0].name) document.getElementById('namaInput').value = contacts[0].name[0];
                 }
-            } catch (ex) { console.log("Batal"); }
-        } else { alert("Fitur kontak ini hanya berjalan di HP (Android/iOS)."); }
+            } catch (e) {}
+        } else { alert("Fitur kontak hanya bisa di HP."); }
     });
 
-    // --- KIRIM DATA ---
+    // --- 2. KIRIM DATA ---
     form.addEventListener('submit', e => {
         e.preventDefault();
         btnSubmit.disabled = true; btnSubmit.innerText = "Mengirim...";
-        const formData = new FormData(form);
-
-        fetch(SCRIPT_URL, { method: 'POST', body: formData })
-        .then(response => {
+        
+        fetch(SCRIPT_URL, { method: 'POST', body: new FormData(form) })
+        .then(() => {
             msg.style.display = "block"; form.reset();
             btnSubmit.disabled = false; btnSubmit.innerText = "Kirim Data";
-            setTimeout(() => { msg.style.display = "none"; }, 3000);
-            if(tableContainer.style.display === "block") loadData();
+            setTimeout(() => msg.style.display = "none", 3000);
+            if(tableContainer.style.display === "block") loadData(); 
         })
-        .catch(error => {
-            alert("Gagal mengirim data.");
-            btnSubmit.disabled = false; btnSubmit.innerText = "Kirim Data";
+        .catch(() => {
+            alert("Gagal kirim."); btnSubmit.disabled = false; btnSubmit.innerText = "Kirim Data";
         });
     });
 
-    // --- LOAD DATA TABEL ---
+    // --- 3. LOAD DATA TABEL (DENGAN FORMAT NOMOR WA) ---
     btnLoad.addEventListener('click', loadData);
 
     function loadData() {
         loader.style.display = "block";
         tableContainer.style.display = "none";
-        tbody.innerHTML = ""; 
+        tbody.innerHTML = "";
 
-        fetch(SCRIPT_URL) 
+        fetch(SCRIPT_URL)
         .then(res => res.json())
         .then(data => {
             loader.style.display = "none";
             tableContainer.style.display = "block";
 
             if (data.length === 0) {
-                tbody.innerHTML = "<tr><td colspan='6' style='text-align:center; padding: 20px;'>Belum ada data</td></tr>";
+                tbody.innerHTML = "<tr><td colspan='6' style='text-align:center; padding:15px;'>Data Kosong</td></tr>";
                 return;
             }
 
             data.forEach((item, index) => {
                 const tr = document.createElement('tr');
-                
-                // MENGGUNAKAN HTML ENTITY AGAR EMOJI AMAN
-                // Centang (Check Mark) = &#9989;
-                // Jam Pasir (Hourglass) = &#9203;
-                // Reschedule (Arrows) = &#128260;
-                // Hapus (Trash) = &#128465;
 
-                const isSent = item.status === "SENT";
-                const statusIcon = isSent ? "&#9989;" : "&#9203;";
+                // --- 1. LOGIC FORMAT NOMOR WA ---
+                // Bersihkan karakter non-angka
+                let rawWa = item.wa.toString().replace(/\D/g, '');
                 
-                // Pastikan item.catatan ada. Jika undefined, ganti string kosong
+                // Format untuk Link (Harus 62...)
+                let waLink = rawWa;
+                if (rawWa.startsWith('0')) {
+                    waLink = '62' + rawWa.slice(1);
+                } else if (rawWa.startsWith('8')) {
+                    waLink = '62' + rawWa;
+                }
+                
+                // Format untuk Tampilan (Harus 08...)
+                let waDisplay = waLink;
+                if (waDisplay.startsWith('62')) {
+                    waDisplay = '0' + waDisplay.slice(2);
+                }
+
+                // --- 2. LOGIC STATUS & CATATAN ---
+                let statusIcon = (item.status === "SENT") ? "&#9989;" : "&#9203;";
                 const catatanText = item.catatan ? item.catatan : "-";
 
                 tr.innerHTML = `
                     <td>${index + 1}</td>
                     <td><b>${item.nama}</b></td>
                     <td>${catatanText}</td>
-                    <td>${item.wa}</td>
-                    <td style="text-align:center; font-size: 1.2rem;">${statusIcon}</td>
+                    <td>
+                        <a href="https://wa.me/${waLink}" target="_blank" class="wa-link">
+                           📱 ${waDisplay}
+                        </a>
+                    </td>
+                    <td style="text-align:center;" class="status-icon">${statusIcon}</td>
                     <td style="text-align:center;">
                         <button class="btn-action btn-reschedule" onclick="handleAction('reschedule', ${item.row})" title="Reschedule">
                             &#128260;
@@ -251,17 +247,17 @@
         })
         .catch(err => {
             loader.style.display = "none";
-            alert("Gagal memuat data. Pastikan sudah Deploy New Version.");
+            alert("Gagal memuat data. Cek Deployment.");
         });
     }
 
-    // --- HANDLE AKSI ---
+    // --- 4. HANDLE AKSI ---
     window.handleAction = function(action, rowNumber) {
-        let confirmMsg = (action === "delete") ? "Hapus data ini?" : "Reschedule (Kirim Ulang) data ini?";
-        if (!confirm(confirmMsg)) return;
+        let confirmText = (action === "delete") ? "Yakin HAPUS data ini?" : "Yakin RESCHEDULE data ini?";
+        if (!confirm(confirmText)) return;
 
         loader.style.display = "block";
-        loader.innerText = "Memproses aksi...";
+        loader.innerText = "Memproses...";
         tableContainer.style.display = "none";
 
         const formData = new FormData();
@@ -275,9 +271,8 @@
             loadData();
         })
         .catch(() => {
-            alert("Gagal melakukan aksi.");
-            loader.style.display = "none";
-            tableContainer.style.display = "block"; 
+            alert("Gagal memproses aksi.");
+            loadData();
         });
     };
 </script>
