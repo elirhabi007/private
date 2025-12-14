@@ -6,8 +6,18 @@
     <title>Jobdesk Manager</title>
 
     <style>
+        /* ==== PERBAIKAN EMOJI (FINAL) ==== */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family:
+                "Segoe UI",
+                "Segoe UI Emoji",
+                "Segoe UI Symbol",
+                "Apple Color Emoji",
+                "Noto Color Emoji",
+                Tahoma,
+                Geneva,
+                Verdana,
+                sans-serif;
             background: #f4f6f9;
             padding: 20px;
             display: flex;
@@ -44,9 +54,8 @@
         button:hover { opacity: 0.9; }
         .loading { opacity: 0.6; pointer-events: none; }
 
-        /* --- STYLE TABEL EXCEL --- */
         #tabel-area {
-            width: 100%; max-width: 650px; /* Lebar ditambah agar muat 6 kolom */
+            width: 100%; max-width: 650px;
             background: white; padding: 10px;
             border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             display: none;
@@ -54,25 +63,24 @@
 
         table {
             width: 100%;
-            border-collapse: collapse; /* Garis menyatu */
+            border-collapse: collapse;
             font-size: 12px;
             color: #333;
         }
 
         th, td {
-            border: 1px solid #999; /* Garis Excel Abu Tua */
+            border: 1px solid #999;
             padding: 8px;
             text-align: center;
             vertical-align: middle;
         }
 
         th {
-            background-color: #e0e0e0; /* Header Abu Muda */
+            background-color: #e0e0e0;
             font-weight: bold;
-            white-space: nowrap; /* Agar header tidak turun baris */
+            white-space: nowrap;
         }
 
-        /* Tombol Aksi di dalam tabel */
         .btn-action {
             background: none; border: none; font-size: 18px; 
             cursor: pointer; padding: 5px; margin: 0;
@@ -80,7 +88,6 @@
             transition: 0.2s;
         }
         .btn-action:hover { background-color: #f0f0f0; transform: scale(1.1); }
-
     </style>
 </head>
 <body>
@@ -92,14 +99,13 @@
         <input type="text" id="catatan" name="catatan" placeholder="Catatan Jobdesk" required>
         <input type="tel" id="wa" name="wa" placeholder="Nomor WhatsApp" required>
 
-        <button type="button" class="btn-wa" onclick="ambilKontak()">📱 Pilih Kontak</button>
+        <button type="button" class="btn-wa" onclick="ambilKontak()">?? Pilih Kontak</button>
         <button type="submit" id="btnSubmit" class="btn-kirim">Kirim Data</button>
-        <button type="button" id="btnJobdesk" class="btn-jobdesk" onclick="loadJobdesk()">📂 Job Desk (Lihat Data)</button>
+        <button type="button" id="btnJobdesk" class="btn-jobdesk" onclick="loadJobdesk()">?? Job Desk (Lihat Data)</button>
     </form>
     <div id="statusMsg" style="text-align:center; color:green; display:none; margin-top:10px;">Berhasil!</div>
 </div>
 
-<!-- TABEL DATA -->
 <div id="tabel-area">
     <h3 style="text-align:center; margin-top:5px; font-size:16px;">Daftar Jobdesk</h3>
     <div style="overflow-x:auto;">
@@ -110,7 +116,6 @@
                     <th>Nama</th>
                     <th>Catatan</th>
                     <th>Status</th>
-                    <!-- DUA KOLOM BARU -->
                     <th style="width:60px">Reschedule</th>
                     <th style="width:50px">Delete</th>
                 </tr>
@@ -121,8 +126,7 @@
 </div>
 
 <script>
-    // URL WEB APP ANDA
-    const scriptURL = "https://script.google.com/macros/s/AKfycbwJq1Vopm-Zyw2tpg-2tjeRbD_FftqCwgO-n_GE-0GLg-HEpn9vTm9uB_guPspasNSu/exec";
+    const scriptURL = "https://script.google.com/macros/s/AKfycbzuFy4oJkvpmE3gdtUCoo2oBErwmCgQ6-1jmOKXwGlvyJHk-H06RzQpeIaaXpQS8RD8/exec";
 
     const form = document.forms['submit-to-google-sheet'];
     const btnSubmit = document.getElementById("btnSubmit");
@@ -130,7 +134,6 @@
     const tabelArea = document.getElementById("tabel-area");
     const tableBody = document.getElementById("tableBody");
 
-    // 1. INPUT DATA
     form.addEventListener('submit', e => {
         e.preventDefault();
         setLoading(btnSubmit, "Mengirim...", true);
@@ -145,13 +148,12 @@
                 setLoading(btnSubmit, "Kirim Data", false);
                 if(tabelArea.style.display === "block") loadJobdesk(); 
             })
-            .catch(err => {
+            .catch(() => {
                 alert("Gagal kirim");
                 setLoading(btnSubmit, "Kirim Data", false);
             });
     });
 
-    // 2. LOAD DATA
     function loadJobdesk() {
         setLoading(btnJob, "Memuat...", true);
         
@@ -162,79 +164,58 @@
                 tableBody.innerHTML = "";
 
                 if(rows.length === 0) {
-                    // Colspan jadi 6 karena ada 6 kolom total
                     tableBody.innerHTML = "<tr><td colspan='6'>Belum ada data</td></tr>";
                 } else {
                     rows.forEach((item, index) => {
                         let data = item.data;
                         let realRow = item.rowIndex; 
                         let statusText = data[4];
-                        let statusEmoji = statusText === 'SENT' ? '✅' : '⏳';
+                        let statusEmoji = statusText === 'SENT' ? '?' : '?';
 
-                        // Tombol Aksi dipecah jadi 2 variabel
                         let cellReschedule = '-';
                         let cellDelete = '-';
 
-                        // Hanya muncul jika status SENT
                         if(statusText === 'SENT') {
-                            cellReschedule = `<button class="btn-action" onclick="handleAction('reschedule', ${realRow})" title="Reschedule (Kirim Ulang)">🔄</button>`;
-                            cellDelete = `<button class="btn-action" onclick="handleAction('delete', ${realRow})" title="Hapus Permanen">🗑️</button>`;
+                            cellReschedule = `<button class="btn-action" onclick="handleAction('reschedule', ${realRow})">??</button>`;
+                            cellDelete = `<button class="btn-action" onclick="handleAction('delete', ${realRow})">???</button>`;
                         }
 
-                        let tr = document.createElement("tr");
-                        tr.innerHTML = `
-                            <td>${index + 1}</td>
-                            <td style="text-align:left; font-weight:500">${data[1]}</td>
-                            <td style="text-align:left">${data[2]}</td>
-                            <td>${statusEmoji}</td>
-                            <td>${cellReschedule}</td> <!-- Kolom Khusus Reschedule -->
-                            <td>${cellDelete}</td>     <!-- Kolom Khusus Delete -->
+                        tableBody.innerHTML += `
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td style="text-align:left">${data[1]}</td>
+                                <td style="text-align:left">${data[2]}</td>
+                                <td>${statusEmoji}</td>
+                                <td>${cellReschedule}</td>
+                                <td>${cellDelete}</td>
+                            </tr>
                         `;
-                        tableBody.appendChild(tr);
                     });
                 }
                 tabelArea.style.display = "block";
-                setLoading(btnJob, "📂 Job Desk (Lihat Data)", false);
-                tabelArea.scrollIntoView({behavior:"smooth"});
+                setLoading(btnJob, "?? Job Desk (Lihat Data)", false);
             });
     }
 
-    // 3. HANDLE AKSI
     function handleAction(actionType, rowNumber) {
-        let confirmMsg = actionType === 'delete' ? "Hapus data ini?" : "Reschedule (Kirim WA Ulang)?";
-        if(!confirm(confirmMsg)) return;
+        if(!confirm(actionType === 'delete' ? "Hapus data ini?" : "Reschedule (Kirim Ulang)?")) return;
 
-        btnJob.innerText = "Memproses...";
-        
         let formData = new FormData();
         formData.append("action", actionType);
         formData.append("row", rowNumber);
 
         fetch(scriptURL, { method: 'POST', body: formData })
             .then(res => res.json())
-            .then(res => {
-                if(res.result === 'success' || res.result === 'updated' || res.result === 'deleted') {
-                    showStatus(actionType === 'delete' ? "Terhapus!" : "Direschedule!");
-                    loadJobdesk(); 
-                } else {
-                    alert("Gagal memproses.");
-                }
-            })
-            .catch(e => {
-                alert("Error koneksi");
-                setLoading(btnJob, "📂 Job Desk (Lihat Data)", false);
-            });
+            .then(() => loadJobdesk());
     }
 
-    // UTILS
-    function setLoading(btn, text, isLoading) {
+    function setLoading(btn, text, state) {
         btn.innerText = text;
-        if(isLoading) btn.classList.add("loading");
-        else btn.classList.remove("loading");
+        btn.classList.toggle("loading", state);
     }
 
     function showStatus(msg) {
-        let el = document.getElementById("statusMsg");
+        const el = document.getElementById("statusMsg");
         el.innerText = msg;
         el.style.display = "block";
         setTimeout(() => el.style.display = "none", 3000);
@@ -244,10 +225,10 @@
         try {
             const contacts = await navigator.contacts.select(["name", "tel"], { multiple: false });
             if (contacts.length) {
-                document.getElementById("nama").value = contacts[0].name[0] || "";
-                document.getElementById("wa").value = contacts[0].tel[0] || "";
+                nama.value = contacts[0].name[0] || "";
+                wa.value = contacts[0].tel[0] || "";
             }
-        } catch (e) {}
+        } catch(e){}
     }
 </script>
 
