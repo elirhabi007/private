@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Input Jobdesk</title>
+    <title>Input Jobdesk & Monitoring</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f4f4f9;
+            background-color: #f0f2f5;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
             margin: 0;
             padding: 20px;
@@ -18,101 +18,79 @@
         }
         .container {
             background: white;
-            padding: 2rem;
+            padding: 1.5rem;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             width: 100%;
-            max-width: 400px;
+            max-width: 600px; /* Diperlebar agar muat kolom Catatan */
         }
-        h2 { 
-            text-align: center; 
-            color: #333; 
-            margin-bottom: 1.5rem; 
-            margin-top: 0;
-        }
-        .form-group { margin-bottom: 1.2rem; }
-        label { 
-            display: block; 
-            margin-bottom: 0.5rem; 
-            color: #555; 
-            font-weight: 500;
-        }
+        h2 { text-align: center; color: #333; margin-top: 0; font-size: 1.5rem; }
         
+        /* FORM STYLES */
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 0.5rem; color: #555; font-weight: 600; font-size: 0.9rem; }
         input, textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            box-sizing: border-box; 
-            font-size: 16px; /* Mencegah zoom in otomatis di iPhone */
-            transition: border-color 0.3s;
+            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px;
+            box-sizing: border-box; font-size: 16px; transition: border 0.3s;
         }
+        input:focus, textarea:focus { border-color: #007bff; outline: none; }
 
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: #007bff;
-        }
-
-        /* --- CSS INPUT GROUP WA --- */
-        .input-group {
-            display: flex;
-            gap: 8px;
-        }
-        .input-group input {
-            flex: 1; /* Input mengambil sisa ruang */
-        }
-        .btn-icon {
-            padding: 0 15px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 1.5rem; /* Ukuran emoji */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
-        }
-        .btn-icon:hover { background-color: #0056b3; }
-        /* -------------------------- */
-
-        button[type="submit"] {
-            width: 100%;
-            padding: 14px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 1rem;
-            margin-top: 1rem;
-            font-weight: bold;
-            transition: background 0.2s;
-        }
-        button[type="submit"]:hover { background-color: #218838; }
-        button:disabled { background-color: #ccc; cursor: not-allowed; }
+        .input-group { display: flex; gap: 8px; }
+        .input-group input { flex: 1; }
         
-        .alert {
-            display: none;
-            padding: 12px;
-            margin-top: 15px;
-            border-radius: 6px;
-            text-align: center;
-            font-size: 0.9rem;
+        .btn-icon {
+            padding: 0 15px; background-color: #007bff; color: white; border: none;
+            border-radius: 8px; cursor: pointer; font-size: 1.4rem;
+            display: flex; align-items: center; justify-content: center;
         }
-        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .btn-icon:hover { background-color: #0069d9; }
+        
+        /* TOMBOL UTAMA */
+        .btn-primary {
+            width: 100%; padding: 14px; background-color: #28a745; color: white;
+            border: none; border-radius: 8px; cursor: pointer; font-size: 1rem;
+            font-weight: bold; margin-top: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .btn-secondary {
+            width: 100%; padding: 12px; background-color: #6c757d; color: white;
+            border: none; border-radius: 8px; cursor: pointer; font-size: 1rem;
+            margin-top: 10px; font-weight: bold;
+        }
+        .btn-primary:hover { background-color: #218838; }
+        .btn-secondary:hover { background-color: #5a6268; }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
+
+        .alert {
+            display: none; padding: 12px; margin-top: 15px; border-radius: 8px;
+            text-align: center; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;
+        }
+
+        /* TABEL STYLES */
+        #tableContainer { margin-top: 25px; display: none; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 400px; }
+        th, td { border-bottom: 1px solid #eee; padding: 10px 5px; text-align: left; vertical-align: middle; }
+        th { background-color: #f8f9fa; color: #495057; font-weight: bold; white-space: nowrap; }
+        tr:last-child td { border-bottom: none; }
+        
+        /* Action Buttons in Table */
+        .btn-action {
+            padding: 6px 10px; border: none; border-radius: 4px; cursor: pointer; margin-right: 3px; font-size: 1.1rem;
+        }
+        .btn-reschedule { background-color: #ffc107; color: #000; }
+        .btn-delete { background-color: #dc3545; color: white; }
+        
+        .loader { text-align: center; margin-top: 15px; color: #666; display: none; font-style: italic; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Input Data Jobdesk</h2>
+    <h2>Input Jobdesk</h2>
     
+    <!-- Form Input -->
     <form id="jobForm">
         <div class="form-group">
             <label>Nama</label>
-            <!-- ID ditambahkan agar mudah diakses script -->
             <input type="text" name="nama" id="namaInput" required placeholder="Contoh: Budi">
         </div>
 
@@ -125,112 +103,183 @@
             <label>Nomor WhatsApp</label>
             <div class="input-group">
                 <input type="tel" name="wa" id="waInput" required placeholder="08123xxxxx">
-                
-                <!-- Menggunakan HTML Entity &#128210; untuk ikon buku agar aman dari error encoding -->
+                <!-- Tombol Kontak menggunakan Entity Code -->
                 <button type="button" class="btn-icon" id="btnContact" title="Ambil dari Kontak HP">
                     &#128210;
                 </button>
             </div>
         </div>
 
-        <button type="submit" id="btnSubmit">Kirim Data</button>
+        <button type="submit" class="btn-primary" id="btnSubmit">Kirim Data</button>
     </form>
 
-    <div id="statusMsg" class="alert success">Data berhasil disimpan!</div>
+    <div id="statusMsg" class="alert">Data berhasil disimpan!</div>
+
+    <!-- Bagian Monitoring -->
+    <hr style="margin: 25px 0; border: 0; border-top: 1px dashed #ccc;">
+    <button type="button" class="btn-secondary" id="btnLoad">Lihat Daftar Jobdesk</button>
+    
+    <div id="loadingText" class="loader">Sedang memuat data...</div>
+
+    <!-- Tabel Data -->
+    <div id="tableContainer">
+        <table id="dataTable">
+            <thead>
+                <tr>
+                    <th style="width: 25px;">#</th>
+                    <th>Nama</th>
+                    <th>Catatan</th> <!-- Kolom Catatan Ditambahkan -->
+                    <th>WhatsApp</th>
+                    <th style="width: 30px; text-align: center;">Sts</th>
+                    <th style="width: 90px; text-align: center;">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data akan muncul di sini -->
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <script>
     // ============================================================
-    // ?? GANTI URL DI BAWAH INI DENGAN URL WEB APP GOOGLE ANDA ??
+    // URL WEB APP GOOGLE SCRIPT ANDA
     // ============================================================
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwh6bNKcmC6kPXxIiQ8UIFp9-7Kuu_pxAUmdgvdywaLuH-fMQ3cPaeiBJwMdd212BGK/exec"; 
+    const SCRIPT_URL = "https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLjHjm04SCNHyjy_tCNn5KVARgipk7PQbBPXg3-zRhzC4G3X35ocXhKh6CJQGn_WYBk5barxqaM8KJgiUD4Dv6aFahxs6xgj3HbdMh0V2B-HgLXsI2mbx4hUjuY5SDpsDO-bYIADvywqzLrIPw6NOr74bK2GZruOKfZKDBvmc9pdrh1j1YDG1B5eaC2Tt5hvbecst1ZjV9e2d7UNkR1D918plfBL53FWpC-MrikOq1E-N9rnffgD3jVKRmnDeEw6dp0PXkgoe0KKo13iw0V2-7Eljbmb6w&lib=MFL5tMvkvKL65CGENPxaLTyYNPH1PCFKC"; 
 
-    // Referensi Elemen HTML
+    // Referensi Elemen
     const form = document.getElementById('jobForm');
-    const btn = document.getElementById('btnSubmit');
+    const btnSubmit = document.getElementById('btnSubmit');
     const msg = document.getElementById('statusMsg');
     const btnContact = document.getElementById('btnContact');
     const waInput = document.getElementById('waInput');
     const namaInput = document.getElementById('namaInput');
+    
+    // Referensi Elemen Tabel
+    const btnLoad = document.getElementById('btnLoad');
+    const tableContainer = document.getElementById('tableContainer');
+    const tbody = document.querySelector('#dataTable tbody');
+    const loader = document.getElementById('loadingText');
 
-    // --- FITUR AMBIL KONTAK (Contact Picker API) ---
+    // --- FITUR AMBIL KONTAK ---
     btnContact.addEventListener('click', async () => {
-        // Cek dukungan browser (Hanya jalan di HP via HTTPS/Localhost)
         const isSupported = ('contacts' in navigator && 'ContactsManager' in window);
-
         if (isSupported) {
             try {
-                // Meminta akses ke 'name' (Nama) dan 'tel' (Nomor)
                 const props = ['name', 'tel']; 
-                const opts = { multiple: false }; // Pilih 1 kontak saja
-                
+                const opts = { multiple: false };
                 const contacts = await navigator.contacts.select(props, opts);
-                
                 if (contacts.length > 0) {
                     const contact = contacts[0];
-
-                    // 1. ISI NOMOR WA
-                    if (contact.tel && contact.tel.length > 0) {
-                        let rawNumber = contact.tel[0];
-                        // Bersihkan nomor (hanya ambil angka)
-                        let cleanNumber = rawNumber.replace(/\D/g, ''); 
-                        waInput.value = cleanNumber;
-                    }
-
-                    // 2. ISI NAMA (Ambil nama kontak jika ada)
-                    if (contact.name && contact.name.length > 0) {
-                        namaInput.value = contact.name[0];
-                    }
+                    if (contact.tel && contact.tel.length > 0) waInput.value = contact.tel[0].replace(/\D/g, ''); 
+                    if (contact.name && contact.name.length > 0) namaInput.value = contact.name[0];
                 }
-            } catch (ex) {
-                // Error biasanya terjadi jika user membatalkan pilihan
-                console.log("Batal pilih kontak atau Error:", ex);
-            }
-        } else {
-            alert("Fitur ini hanya berjalan di HP (Android/iOS) menggunakan Chrome/Safari versi terbaru.");
-        }
+            } catch (ex) { console.log("Batal"); }
+        } else { alert("Fitur kontak ini hanya berjalan di HP (Android/iOS)."); }
     });
 
-    // --- LOGIC PENGIRIMAN DATA KE GOOGLE SHEET ---
+    // --- KIRIM DATA ---
     form.addEventListener('submit', e => {
-        e.preventDefault(); // Mencegah reload halaman
-        
-        // Ubah tampilan tombol saat proses kirim
-        btn.disabled = true;
-        btn.innerText = "Mengirim...";
-
+        e.preventDefault();
+        btnSubmit.disabled = true; btnSubmit.innerText = "Mengirim...";
         const formData = new FormData(form);
 
-        fetch(SCRIPT_URL, {
-            method: 'POST',
-            body: formData
-        })
+        fetch(SCRIPT_URL, { method: 'POST', body: formData })
         .then(response => {
-            console.log('Success!', response);
-            
-            // Tampilkan pesan sukses
-            msg.style.display = "block";
-            
-            // Reset Form
-            form.reset(); 
-            
-            // Kembalikan tombol seperti semula
-            btn.disabled = false;
-            btn.innerText = "Kirim Data";
-            
-            // Sembunyikan pesan sukses setelah 3 detik
-            setTimeout(() => {
-                msg.style.display = "none";
-            }, 3000);
+            msg.style.display = "block"; form.reset();
+            btnSubmit.disabled = false; btnSubmit.innerText = "Kirim Data";
+            setTimeout(() => { msg.style.display = "none"; }, 3000);
+            if(tableContainer.style.display === "block") loadData();
         })
         .catch(error => {
-            console.error('Error!', error.message);
-            alert("Gagal mengirim data. Pastikan URL Script benar dan ada koneksi internet.");
-            
-            btn.disabled = false;
-            btn.innerText = "Kirim Data";
+            alert("Gagal mengirim data.");
+            btnSubmit.disabled = false; btnSubmit.innerText = "Kirim Data";
         });
     });
+
+    // --- LOAD DATA TABEL ---
+    btnLoad.addEventListener('click', loadData);
+
+    function loadData() {
+        loader.style.display = "block";
+        tableContainer.style.display = "none";
+        tbody.innerHTML = ""; 
+
+        fetch(SCRIPT_URL) 
+        .then(res => res.json())
+        .then(data => {
+            loader.style.display = "none";
+            tableContainer.style.display = "block";
+
+            if (data.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='6' style='text-align:center; padding: 20px;'>Belum ada data</td></tr>";
+                return;
+            }
+
+            data.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                
+                // MENGGUNAKAN HTML ENTITY AGAR EMOJI AMAN
+                // Centang (Check Mark) = &#9989;
+                // Jam Pasir (Hourglass) = &#9203;
+                // Reschedule (Arrows) = &#128260;
+                // Hapus (Trash) = &#128465;
+
+                const isSent = item.status === "SENT";
+                const statusIcon = isSent ? "&#9989;" : "&#9203;";
+                
+                // Pastikan item.catatan ada. Jika undefined, ganti string kosong
+                const catatanText = item.catatan ? item.catatan : "-";
+
+                tr.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td><b>${item.nama}</b></td>
+                    <td>${catatanText}</td>
+                    <td>${item.wa}</td>
+                    <td style="text-align:center; font-size: 1.2rem;">${statusIcon}</td>
+                    <td style="text-align:center;">
+                        <button class="btn-action btn-reschedule" onclick="handleAction('reschedule', ${item.row})" title="Reschedule">
+                            &#128260;
+                        </button>
+                        <button class="btn-action btn-delete" onclick="handleAction('delete', ${item.row})" title="Hapus">
+                            &#128465;
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        })
+        .catch(err => {
+            loader.style.display = "none";
+            alert("Gagal memuat data. Pastikan sudah Deploy New Version.");
+        });
+    }
+
+    // --- HANDLE AKSI ---
+    window.handleAction = function(action, rowNumber) {
+        let confirmMsg = (action === "delete") ? "Hapus data ini?" : "Reschedule (Kirim Ulang) data ini?";
+        if (!confirm(confirmMsg)) return;
+
+        loader.style.display = "block";
+        loader.innerText = "Memproses aksi...";
+        tableContainer.style.display = "none";
+
+        const formData = new FormData();
+        formData.append("action", action);
+        formData.append("row", rowNumber);
+
+        fetch(SCRIPT_URL, { method: 'POST', body: formData })
+        .then(res => res.json())
+        .then(() => {
+            loader.innerText = "Sedang memuat data...";
+            loadData();
+        })
+        .catch(() => {
+            alert("Gagal melakukan aksi.");
+            loader.style.display = "none";
+            tableContainer.style.display = "block"; 
+        });
+    };
 </script>
 
 </body>
